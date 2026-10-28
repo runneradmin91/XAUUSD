@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ذهب">
+<meta name="theme-color" content="#0f1a24">
+<title>تحليل الذهب XAUUSD</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1a24;--sf:#172431;--ln:#27384a;--tx:#e8edf2;--mu:#8ea0b2;--gd:#e0b44c;--up:#34c796;--dn:#ee6a55}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.6 "IBM Plex Sans Arabic",system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:520px;margin:0 auto;padding:12px 12px 40px}
+header{display:flex;justify-content:space-between;align-items:center;font-size:18px}
+.pill{font-size:13px;padding:2px 10px;border-radius:99px;background:var(--sf);border:1px solid var(--ln);color:var(--mu)}
+.pill.ok{color:var(--up);border-color:var(--up)}
+.c{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-top:12px}
+.hero{border-radius:22px;text-align:center}
+h2{font-size:15px;margin:0 0 8px;color:var(--mu);font-weight:600}
+.n{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+#px{font-size:60px;font-weight:700;color:var(--gd);line-height:1.1}
+canvas{width:100%;height:120px;display:block;margin-top:8px}
+small,.mu{color:var(--mu);font-size:13px}
+.sig{border-width:2px}.sig.buy{border-color:var(--up)}.sig.sell{border-color:var(--dn)}
+.word{font-size:46px;font-weight:700;line-height:1.2}
+.buy .word{color:var(--up)}.sell .word{color:var(--dn)}.wait .word{color:var(--mu)}
+.bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--gd)}
+.pb{display:flex}.pb i{display:block;height:100%}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.g div{background:var(--bg);border-radius:8px;padding:8px 4px;text-align:center}
+.g b{display:block;font-size:17px}
+ul{margin:6px 0 0;padding:0 18px}li.u{color:var(--up)}li.d{color:var(--dn)}li{font-size:14px}
+button,select,input{font:inherit;font-size:16px;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:9px 10px;width:100%}
+button{background:var(--gd);color:#1a1405;font-weight:700;border:0;margin-top:12px;padding:12px}
+.r{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.r>*:last-child{width:46%}
+.nw{padding:8px 0;border-top:1px solid var(--ln);font-size:14px;direction:ltr;text-align:left}
+.nw:first-child{border:0}.nw a{color:var(--tx);text-decoration:none}
+.tag{display:inline-block;font-size:12px;padding:0 8px;border-radius:6px;margin-inline-end:6px;direction:rtl}
+.tag.u{background:#12382d;color:var(--up)}.tag.d{background:#40201b;color:var(--dn)}.tag.z{background:var(--bg);color:var(--mu)}
+#bn{position:fixed;top:env(safe-area-inset-top);left:8px;right:8px;z-index:9;padding:14px;border-radius:12px;text-align:center;font-size:20px;font-weight:700;color:#fff}
+#bn[hidden]{display:none}
+</style>
+</head>
+<body>
+<main>
+<header><b>الذهب · XAUUSD</b><span id="st" class="pill">جاري الاتصال…</span></header>
+<div class="c hero"><div id="px" class="n">--</div><div id="chg"></div><canvas id="cv"></canvas><small id="ssn"></small></div>
+<button id="en">تفعيل التنبيهات والصوت (اضغطه مرة وحدة)</button>
+<div class="c sig wait" id="sg"><h2>الإشارة</h2>جاري تجميع الشموع…</div>
+<div class="c" id="pr"></div>
+<div class="c"><h2>الأخبار وتأثيرها على الذهب</h2><div id="nws" class="mu">جاري تحميل الأخبار…</div></div>
+<div class="c"><h2>الإعدادات</h2>
+<div class="r"><span>رصيد حسابك ($)</span><input id="bal" type="number" inputmode="decimal"></div>
+<div class="r"><span>المخاطرة بكل صفقة</span><select id="risk"><option value="0.5">0.5%</option><option value="1">1%</option><option value="2">2%</option></select></div>
+<div class="r"><span>حساسية الإشارات</span><select id="min"><option value="32">أكثر إشارات</option><option value="40">متوازنة</option><option value="52">أقل وأدق</option></select></div>
+<div class="r"><span>سعر MT5 الآن (للمعايرة)</span><input id="mt" type="number" inputmode="decimal" placeholder="مثال 2650.40"></div>
+<div class="r"><small id="offt"></small><span style="width:46%"><button id="cal" style="margin:0;padding:9px">معايرة</button></span></div>
+<div class="r"><span>صوت التنبيه</span><input id="snd" type="checkbox" style="width:24px;height:24px"></div>
+<div class="r"><span>إبقاء الشاشة شغالة</span><input id="wk" type="checkbox" style="width:24px;height:24px"></div>
+</div>
+<div class="c"><h2>اقرأها قبل الاعتماد</h2><small>
+الأسعار حية من Binance (XAUUSDT، وإذا ما اشتغل يستعمل PAXG) وتقترب من سعر MT5 لكن ليست نفس سعر وسيطك، لذلك استعمل خانة المعايرة: اكتب سعر MT5 مرة وحدة والصفحة تضيف الفرق على كل شي.<br>
+الربط المباشر بحساب MT5 من صفحة ويب غير ممكن بدون سيرفر وسيط، فالمعايرة هي البديل.<br>
+التحليل إحصائي (مؤشرات الشموع + قراءة عناوين الأخبار) وليس ذكاء يعرف الغيب، ولا أحد يضمن اتجاه السعر. "قوة الإشارة" ليست نسبة نجاح. التزم بوقف الخسارة دائماً، وجرّب على حساب تجريبي أولاً.<br>
+اترك الصفحة مفتوحة والشاشة شغالة حتى توصلك التنبيهات، الآيفون يوقف الصفحات بالخلفية.</small></div>
+</main>
+<div id="bn" hidden></div>
+<script>
+const $=id=>document.getElementById(id),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),lst=a=>a[a.length-1];
+let S={bal:1000,risk:1,off:0,min:40,snd:true,wk:true};
+try{Object.assign(S,JSON.parse(localStorage.gs||"{}"))}catch(e){}
+const save=()=>{try{localStorage.gs=JSON.stringify(S)}catch(e){}};
+let H=[];try{H=JSON.parse(localStorage.gh||"[]")}catch(e){}
+const SRC=[
+{n:"XAUUSDT",r:"https://fapi.binance.com/fapi/v1/klines?symbol=XAUUSDT&interval=1m&limit=500",w:"wss://fstream.binance.com/ws/xauusdt@kline_1m"},
+{n:"PAXG",r:"https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1m&limit=500",w:"wss://stream.binance.com:9443/ws/paxgusdt@kline_1m"},
+{n:"PAXG-2",r:"https://data-api.binance.vision/api/v3/klines?symbol=PAXGUSDT&interval=1m&limit=500",w:"wss://data-stream.binance.vision/ws/paxgusdt@kline_1m"}];
+let C=[],si=0,W,wsOk=0,lastT=0,AN=null,SG=null,CX=0,N=0,NW=[],tmr,AC,WL,fails=0;
+const row=k=>({t:k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4]});
+async function load(){for(let i=0;i<SRC.length;i++){try{const r=await fetch(SRC[i].r);if(!r.ok)throw 0;C=(await r.json()).map(row);si=i;lastT=Date.now();return true}catch(e){}}return false}
+function ws(){clearTimeout(tmr);try{if(W){W.onclose=W.onerror=null;W.close()}}catch(e){}
+ let w;try{w=W=new WebSocket(SRC[si].w)}catch(e){tmr=setTimeout(ws,4000);return}
+ w.onopen=()=>{wsOk=1};
+ w.onmessage=m=>{try{const k=JSON.parse(m.data).k;tick({t:k.t,o:+k.o,h:+k.h,l:+k.l,c:+k.c})}catch(e){}};
+ w.onclose=w.onerror=()=>{if(w!==W)return;wsOk=0;clearTimeout(tmr);tmr=setTimeout(ws,3000)}}
+async function poll(){if(wsOk&&Date.now()-lastT<6000)return;try{const r=await fetch(SRC[si].r.replace("limit=500","limit=3"));(await r.json()).forEach(k=>tick(row(k)))}catch(e){}}
+function tick(k){const L=lst(C);lastT=Date.now();if(L&&L.t===k.t)C[C.length-1]=k;else if(!L||k.t>L.t){C.push(k);if(C.length>700)C.shift();onClose()}render()}
+const ema=(a,p)=>{const k=2/(p+1);let e=a[0];const o=[e];for(let i=1;i<a.length;i++){e=a[i]*k+e*(1-k);o.push(e)}return o};
+function rsi(a,p=14){let g=0,l=0;for(let i=1;i<=p;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}g/=p;l/=p;for(let i=p+1;i<a.length;i++){const d=a[i]-a[i-1];g=(g*(p-1)+Math.max(d,0))/p;l=(l*(p-1)+Math.max(-d,0))/p}return l?100-100/(1+g/l):100}
+function atr(c,p=14){let s=0;for(let i=c.length-p;i<c.length;i++)s+=Math.max(c[i].h-c[i].l,Math.abs(c[i].h-c[i-1].c),Math.abs(c[i].l-c[i-1].c));return s/p}
+function slope(a){const n=a.length,mx=(n-1)/2,my=a.reduce((x,y)=>x+y)/n;let u=0,d=0;a.forEach((y,i)=>{u+=(i-mx)*(y-my);d+=(i-mx)**2});return u/d}
+function analyze(){
+ const cs=C.slice(0,-1);if(cs.length<150)return null;
+ const c=cs.map(x=>x.c),n=c.length-1,px=c[n],A=atr(cs);
+ const e9=ema(c,9)[n],e21=ema(c,21)[n],e50=ema(c,50)[n];
+ const a12=ema(c,12),a26=ema(c,26),ml=a12.map((v,i)=>v-a26[i]),sg=ema(ml,9),h=ml[n]-sg[n],h1=ml[n-1]-sg[n-1];
+ const r=rsi(c.slice(-120)),w=c.slice(-20),mean=w.reduce((x,y)=>x+y)/20,sd=Math.sqrt(w.reduce((x,y)=>x+(y-mean)**2,0)/20);
+ const bb=(px-mean)/(2*sd||1),sl=slope(c.slice(-15))/A;
+ const f=[];for(let i=c.length-1;i>=4;i-=5)f.unshift(c[i]);
+ const t5=ema(f,9)[f.length-1]-ema(f,21)[f.length-1];
+ let s=0;const R=[],add=(p,t)=>{s+=p;if(t)R.push([p,t])};
+ e9>e21&&e21>e50?add(22,"المتوسطات المتحركة كلها صاعدة"):e9<e21&&e21<e50?add(-22,"المتوسطات المتحركة كلها هابطة"):add(e9>e21?6:-6,"اتجاه قصير غير واضح");
+ add(px>e21?8:-8,px>e21?"السعر فوق متوسط 21":"السعر تحت متوسط 21");
+ add(h>0?(h>h1?18:8):(h<h1?-18:-8),h>0?"زخم الماكد إيجابي":"زخم الماكد سلبي");
+ r<30?add(14,"RSI منخفض جداً ("+r.toFixed(0)+") ارتداد محتمل"):r>70?add(-14,"RSI مرتفع جداً ("+r.toFixed(0)+") تراجع محتمل"):add((r-50)/5);
+ bb>1?add(-8,"السعر خارج البولنجر العلوي"):bb<-1&&add(8,"السعر خارج البولنجر السفلي");
+ add(cl(sl*40,-20,20),sl>0.05?"آخر 15 دقيقة تصاعدية":sl<-0.05?"آخر 15 دقيقة تنازلية":"");
+ add(t5>0?14:-14,t5>0?"اتجاه 5 دقائق صاعد":"اتجاه 5 دقائق هابط");
+ if(Math.abs(N)>.15)add(N*10,N>0?"الأخبار تميل للصعود":"الأخبار تميل للهبوط");
+ const m=S.min;let dir="WAIT",why="";
+ if(A<0.2)why="السوق راكد حالياً (حركة ضعيفة)";
+ else if(s>=m)dir="BUY";else if(s<=-m)dir="SELL";
+ else why="لا توجد أفضلية واضحة بعد";
+ if(dir!=="WAIT"&&SG&&SG.dir!==dir&&Math.abs(s)<m+10){dir="WAIT";why="إشارة عكسية ضعيفة، ننتظر تأكيد"}
+ const drift=cl(sl,-1,1)*A*3+(s/100)*A*3;
+ return{s,R,A,dir,why,drift}}
+function onClose(silent){
+ const L=lst(C).c;
+ H.forEach(x=>{if(!x.d&&Date.now()-x.t>3e5){x.d=1;x.ok=(L-x.e)*(x.dir==="BUY"?1:-1)>0}});H=H.slice(-200);
+ try{localStorage.gh=JSON.stringify(H)}catch(e){}
+ const a=analyze();if(!a)return;AN=a;
+ if(a.dir!=="WAIT"&&(!SG||SG.dir!==a.dir)){
+  SG={dir:a.dir,t:Date.now(),entry:L,A:a.A,s:a.s};H.push({t:SG.t,dir:a.dir,e:L});
+  if(!silent)notify(a.dir)}}
+const nm={BUY:"شراء",SELL:"بيع",WAIT:"انتظر"};
+function sess(){const h=new Date().getUTCHours();return h>=13&&h<16?"ذروة السيولة (تداخل لندن ونيويورك)":h>=7&&h<21?"سيولة جيدة":"سيولة ضعيفة، الإشارات أقل موثوقية"}
+function render(){
+ if(!C.length)return;const L=lst(C).c,o=S.off,now=Date.now();
+ $("px").textContent=(L+o).toFixed(2);
+ const d=L-C[Math.max(0,C.length-61)].c;
+ $("chg").innerHTML='<span class="n" style="color:var(--'+(d>=0?"up":"dn")+')">'+(d>=0?"+":"")+d.toFixed(2)+"</span> <small>خلال ساعة</small>";
+ const ok=wsOk&&now-lastT<8000;$("st").textContent=(ok?"● مباشر":"○ تأخير")+" · "+SRC[si].n;$("st").className="pill"+(ok?" ok":"");
+ $("ssn").textContent="السيولة الآن: "+sess();
+ draw();
+ if(!AN){return}
+ let cls="wait",note=AN.why,lv="";
+ if(SG){const sn=SG.dir==="BUY"?1:-1,age=(now-SG.t)/1000;
+  if((L-SG.entry)*sn<-0.6*SG.A||age>900){SG=null;CX=now}
+  else{cls=SG.dir.toLowerCase();
+   note=age<=120&&Math.abs(L-SG.entry)<=.5*SG.A?"ادخل الآن، الإشارة صالحة "+Math.round(120-age)+" ثانية":"فات وقت الدخول المثالي. إذا دخلت تابع الستوب والأهداف";
+   const A=SG.A,E=SG.entry,f=v=>(v+o).toFixed(2),risk=S.bal*S.risk/100,lot=Math.max(.01,Math.floor(risk/(1.5*A*100)*100)/100),loss=lot*1.5*A*100;
+   lv='<div class="g n"><div><small>دخول</small><b>'+f(E)+'</b></div><div><small>وقف الخسارة</small><b style="color:var(--dn)">'+f(E-sn*1.5*A)+'</b></div><div><small>هدف 1</small><b style="color:var(--up)">'+f(E+sn*1.5*A)+'</b></div><div><small>هدف 2</small><b style="color:var(--up)">'+f(E+sn*3*A)+'</b></div><div><small>حجم اللوت</small><b>'+lot.toFixed(2)+'</b></div><div><small>أقصى خسارة</small><b>$'+loss.toFixed(0)+'</b></div></div>'+
+   '<small>مدة الصفقة المتوقعة 3 إلى 8 دقائق (فريم الدقيقة).'+(loss>risk*1.5?" ⚠️ أقل لوت 0.01 يتجاوز نسبة مخاطرتك.":"")+"</small>"}}
+ if(!SG&&now-CX<9e4)note="أُلغيت الإشارة السابقة لأن السعر عكسها";
+ const hd=H.filter(x=>x.d),hit=hd.filter(x=>x.ok).length;
+ const top=[...AN.R].sort((a,b)=>Math.abs(b[0])-Math.abs(a[0])).slice(0,4).map(x=>'<li class="'+(x[0]>0?"u":"d")+'">'+x[1]+"</li>").join("");
+ $("sg").className="c sig "+cls;
+ $("sg").innerHTML='<h2>الإشارة</h2><div class="word">'+nm[SG?SG.dir:"WAIT"]+"</div><div>"+note+"</div>"+lv+
+  '<div class="bar"><i style="width:'+Math.min(100,Math.abs(AN.s))+'%"></i></div><small>قوة الاتجاه '+Math.abs(AN.s).toFixed(0)+" من 100 (الحد للإشارة "+S.min+")"+(hd.length?" · إصابة الإشارات السابقة بعد 5 دقائق: "+hit+" من "+hd.length:"")+"</small><ul>"+top+"</ul>";
+ const pu=1/(1+Math.exp(-AN.s/22))*100,pp=L+AN.drift+o,rg=AN.A*2.2;
+ $("pr").innerHTML='<h2>توقع الذكاء الإحصائي للدقائق الخمس القادمة</h2><div class="pb" style="height:10px;border-radius:5px;overflow:hidden"><i style="width:'+pu+'%;background:var(--up)"></i><i style="width:'+(100-pu)+'%;background:var(--dn)"></i></div><div class="r" style="margin:6px 0"><span style="color:var(--up)">صعود '+pu.toFixed(0)+'%</span><span style="color:var(--dn);width:auto">هبوط '+(100-pu).toFixed(0)+'%</span></div><div>السعر المتوقع: <b class="n">'+pp.toFixed(2)+'</b> <small class="n">('+(pp-rg).toFixed(2)+" – "+(pp+rg).toFixed(2)+')</small></div><div style="margin-top:6px">'+
+  (N>.15?"الأخبار تتوقع صعود الذهب":N<-.15?"الأخبار تتوقع هبوط الذهب":"الأخبار محايدة حالياً")+"</div>"}
+function draw(){
+ const cv=$("cv"),x=cv.getContext("2d"),W2=cv.width=cv.clientWidth*2,H2=cv.height=240,d=C.slice(-60).map(k=>k.c);if(d.length<2)return;
+ const ln=[];if(SG){const sn=SG.dir==="BUY"?1:-1;ln.push([SG.entry,"#8ea0b2"],[SG.entry-sn*1.5*SG.A,"#ee6a55"],[SG.entry+sn*1.5*SG.A,"#34c796"],[SG.entry+sn*3*SG.A,"#34c796"])}
+ const all=d.concat(ln.map(l=>l[0])),lo=Math.min(...all),hi=Math.max(...all),y=v=>H2-8-(v-lo)/((hi-lo)||1)*(H2-16);
+ x.clearRect(0,0,W2,H2);x.lineWidth=2;x.setLineDash([8,8]);ln.forEach(l=>{x.strokeStyle=l[1];x.beginPath();x.moveTo(0,y(l[0]));x.lineTo(W2,y(l[0]));x.stroke()});x.setLineDash([]);
+ x.strokeStyle="#e0b44c";x.lineWidth=3;x.beginPath();d.forEach((v,i)=>{const px=i/(d.length-1)*W2;i?x.lineTo(px,y(v)):x.moveTo(px,y(v))});x.stroke()}
+function unlock(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}}
+function beep(up){if(!S.snd||!AC)return;[0,.2,.4].forEach((t,i)=>{try{const o=AC.createOscillator(),g=AC.createGain(),T=AC.currentTime+t;o.frequency.value=up?660+i*160:1000-i*160;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.3,T);g.gain.exponentialRampToValueAtTime(.001,T+.17);o.start(T);o.stop(T+.18)}catch(e){}})}
+function notify(dir){const up=dir==="BUY",b=$("bn");beep(up);
+ b.style.background=up?"#1f8f6c":"#c4452f";b.textContent=(up?"إشارة شراء ":"إشارة بيع ")+"على الذهب الآن";b.hidden=false;setTimeout(()=>b.hidden=true,15000);
+ try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+ try{window.Notification&&Notification.permission==="granted"&&new Notification("الذهب: "+nm[dir])}catch(e){}}
+$("bn").onclick=()=>$("bn").hidden=true;
+async function wake(){try{if(S.wk&&"wakeLock"in navigator&&!document.hidden)WL=await navigator.wakeLock.request("screen")}catch(e){}}
+$("en").onclick=()=>{unlock();beep(true);wake();try{window.Notification&&Notification.requestPermission()}catch(e){}$("en").textContent="التنبيهات مفعّلة ✓ (اترك الصفحة مفتوحة)"};
+document.addEventListener("visibilitychange",async()=>{if(!document.hidden){wake();if(await load()){onClose(true);ws()}}});
+const sent=t=>{t=t.toLowerCase();let s=0;
+ [["rate cut",2],["cuts rate",2],["dovish",2],["weak dollar",2],["dollar falls",2],["dollar slips",2],["dollar drops",2],["safe haven",2],["safe-haven",2],["geopolitic",1],["war",1],["tension",1],["conflict",1],["record high",2],["all-time high",2],["rally",1],["bullish",2],["yields fall",2],["yields drop",2],["central bank buy",2],["rate hike",-2],["hawkish",-2],["strong dollar",-2],["dollar rises",-2],["dollar gains",-2],["dollar surges",-2],["yields rise",-2],["yields climb",-2],["sell-off",-2],["selloff",-2],["profit-taking",-1],["ceasefire",-1],["peace",-1],["bearish",-2],["strong jobs",-1],["hot jobs",-1]].forEach(([k,v])=>{if(t.includes(k))s+=v});
+ const inv=/dollar|yield|usd|treasur/.test(t)&&!/gold|xau/.test(t)?-1:1,up=/surge|jump|gain|climb|soar|rise|rises|higher|up /.test(t),dn=/drop|fall|slump|slide|tumble|decline|lower|down /.test(t);
+ s+=inv*((up?1:0)-(dn?1:0));return cl(s,-2,2)};
+async function news(){try{
+ const u="https://news.google.com/rss/search?q="+encodeURIComponent('gold price OR XAUUSD OR Fed OR "dollar index" when:1d')+"&hl=en-US&gl=US&ceid=US:en";
+ const j=await(await fetch("https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(u))).json();
+ NW=j.items.slice(0,8).map(i=>({t:i.title.replace(/ - [^-]+$/,""),m:Math.round((Date.now()-Date.parse(i.pubDate.replace(" ","T")+"Z"))/6e4),l:i.link,s:sent(i.title)}));
+ N=cl(NW.reduce((a,b)=>a+b.s,0)/6,-1,1);
+ const tm=m=>m<0?"":m<60?m+" د":Math.round(m/60)+" س";
+ $("nws").innerHTML='<div style="margin-bottom:8px;color:var(--tx)">'+(N>.15?"الخلاصة: الأخبار تتوقع صعود الذهب":N<-.15?"الخلاصة: الأخبار تتوقع هبوط الذهب":"الخلاصة: الأخبار محايدة")+"</div>"+
+  NW.map(x=>'<div class="nw"><span class="tag '+(x.s>0?"u":x.s<0?"d":"z")+'">'+(x.s>0?"صعودي":x.s<0?"هبوطي":"محايد")+'</span><a href="'+x.l+'" target="_blank" rel="noopener">'+x.t.replace(/</g,"&lt;")+'</a> <small>'+tm(x.m)+"</small></div>").join("")
+ }catch(e){$("nws").textContent="تعذر تحميل الأخبار الآن، سيعاد المحاولة تلقائياً"}}
+function ui(){$("bal").value=S.bal;$("risk").value=S.risk;$("min").value=S.min;$("snd").checked=S.snd;$("wk").checked=S.wk;$("offt").textContent=S.off?"فرق المعايرة: "+(S.off>0?"+":"")+S.off.toFixed(2):"بدون معايرة"}
+$("bal").onchange=e=>{S.bal=Math.max(1,+e.target.value||1000);save()};
+$("risk").onchange=e=>{S.risk=+e.target.value;save()};
+$("min").onchange=e=>{S.min=+e.target.value;save()};
+$("snd").onchange=e=>{S.snd=e.target.checked;save()};
+$("wk").onchange=e=>{S.wk=e.target.checked;save();wake()};
+$("cal").onclick=()=>{const v=+$("mt").value;if(!C.length)return;S.off=v?+(v-lst(C).c).toFixed(2):0;save();ui();render()};
+ui();
+(async function boot(){while(!(await load())){$("st").textContent="تعذر الاتصال، أعيد المحاولة…";await new Promise(r=>setTimeout(r,4000))}onClose(true);render();ws()})();
+setInterval(poll,3000);setInterval(render,1000);setInterval(news,18e4);news();
+</script>
+</body>
+</html>
